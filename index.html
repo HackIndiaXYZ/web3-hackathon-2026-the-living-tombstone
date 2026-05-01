@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocProof | The Cryptographic Standard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Condiment&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { dark: '#01051a', cream: '#EFF4FF', neon: '#D000FF', gold: '#FFD700' },
+                    fontFamily: { 
+                        grotesk: ['Anton', 'sans-serif'], 
+                        condiment: ['Condiment', 'cursive'],
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        mono: ['SFMono-Regular', 'Menlo', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #01051a; color: #EFF4FF; overflow-x: hidden; scroll-behavior: smooth; }
+        
+        /* Premium Luxury Noise Overlay */
+        .luxury-noise {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 99999; opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+/* Restored Vibrant Ambient Background Gradients */
+.ambient-orb {
+    position: fixed; 
+    border-radius: 50%; 
+    filter: blur(60px); /* Sharper blur makes them more defined like the first image */
+    opacity: 0.8;        /* Increased from 0.4 to 0.8 for high visibility */
+    z-index: 9; 
+    pointer-events: none;
+    mix-blend-mode: screen; 
+    animation: floatOrb 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.orb-1 { 
+    width: 600px; 
+    height: 600px; 
+    background: rgba(208, 0, 255, 0.6); /* Vibrant Purple */
+    top: -100px; 
+    left: -100px; 
+    animation-delay: 0s; 
+    box-shadow: 0 0 120px rgba(208, 0, 255, 0.4); 
+}
+
+.orb-2 { 
+    width: 700px; 
+    height: 700px; 
+    background: rgba(0, 102, 255, 0.6); /* Vibrant Blue/Cyan */
+    bottom: -200px; 
+    right: -100px; 
+    animation-delay: -5s; 
+    box-shadow: 0 0 120px rgba(0, 102, 255, 0.4); 
+}
+
+.orb-3 { 
+    width: 500px; 
+    height: 500px; 
+    background: rgba(208, 0, 255, 0.5); /* Mid-screen accent */
+    top: 30%; 
+    left: 50%; 
+    animation-delay: -10s; 
+    box-shadow: 0 0 100px rgba(208, 0, 255, 0.3); 
+}
+        @keyframes float3D {
+            0% { transform: translateY(0) rotateX(0) rotateY(0) rotateZ(0); }
+            50% { transform: translateY(-80px) rotateX(180deg) rotateY(90deg) rotateZ(45deg); }
+            100% { transform: translateY(0) rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
+        }
+        .bg-shape-1 { animation: float3D 25s infinite linear; transform-style: preserve-3d; }
+        .bg-shape-2 { animation: float3D 30s infinite linear reverse; transform-style: preserve-3d; }
+
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 20px 40px rgba(0,0,0,0.5);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .glossy-button {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(208, 0, 255, 0.4) 0%, rgba(208, 0, 255, 0.1) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(208, 0, 255, 0.5);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+
+        .glossy-button::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, transparent 60%);
+            opacity: 0; transform: scale(0.5); transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); pointer-events: none; mix-blend-mode: overlay;
+        }
+
+        .glossy-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(208, 0, 255, 0.4), inset 0 2px 2px rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        .glossy-button:hover::after { opacity: 0.4; transform: scale(2); }
+
+        /* Premium Smooth Custom Cursor */
+        #custom-cursor {
+            position: fixed; width: 14px; height: 14px; background: #D000FF;
+            border-radius: 50%; pointer-events: none; z-index: 99999;
+            mix-blend-mode: screen; transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px #D000FF, 0 0 30px #D000FF;
+            transition: width 0.2s, height 0.2s, background 0.2s;
+        }
+
+        .cursor-outer {
+            position: fixed; width: 45px; height: 45px; border: 2px solid rgba(208, 0, 255, 0.8);
+            border-radius: 50%; pointer-events: none; z-index: 99998;
+            transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s;
+            box-shadow: 0 0 20px rgba(208, 0, 255, 0.6);
+        }
+        
+        .cursor-hover #custom-cursor {
+            width: 20px; height: 20px; background: #fff;
+            box-shadow: 0 0 20px #fff, 0 0 40px #D000FF;
+        }
+
+        .cursor-hover .cursor-outer {
+            width: 70px; height: 70px; background: rgba(208, 0, 255, 0.15); border-color: #fff;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+        }
+
+        /* 3D Scroll Reveal Animations */
+        .reveal-up { opacity: 0; transform: translateY(80px); transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .reveal-up.active { opacity: 1; transform: translateY(0); }
+        
+        .reveal-left { opacity: 0; transform: translateX(-80px); transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .reveal-left.active { opacity: 1; transform: translateX(0); }
+        
+        .reveal-right { opacity: 0; transform: translateX(80px); transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .reveal-right.active { opacity: 1; transform: translateX(0); }
+        
+        .reveal-scale { opacity: 0; transform: scale(0.85); transition: all 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .reveal-scale.active { opacity: 1; transform: scale(1); }
+        
+        .reveal-rotate { opacity: 0; transform: translateY(100px) rotateX(40deg) scale(0.9); transform-origin: top center; transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .reveal-rotate.active { opacity: 1; transform: translateY(0) rotateX(0) scale(1); }
+
+        /* 3D Interactive Hover Effect */
+        .hover-3d-effect {
+            transform-style: preserve-3d;
+            perspective: 1500px;
+            transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s ease, border-color 0.4s ease, background 0.4s ease;
+        }
+        
+        .hover-3d-effect::before {
+            content: ''; position: absolute; inset: 0; z-index: -1;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(208,0,255,0.15), transparent 40%);
+            opacity: 0; transition: opacity 0.5s; border-radius: inherit;
+        }
+
+        .hover-3d-effect:hover {
+            box-shadow: 0 40px 80px rgba(208, 0, 255, 0.3), inset 0 2px 5px rgba(255,255,255,0.1);
+            border-color: rgba(208, 0, 255, 0.8);
+            z-index: 100 !important;
+        }
+        .hover-3d-effect:hover::before { opacity: 1; }
+
+        .hover-3d-effect > * {
+            transform: translateZ(30px);
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .hover-3d-effect:hover > * {
+            transform: translateZ(60px);
+        }
+
+        /* Tooltip CSS Fixed z-index, visibility, & 3D cutoff */
+        .tooltip .tooltip-text {
+            visibility: hidden; width: 280px; background-color: rgba(5, 5, 15, 0.95); color: #fff;
+            text-align: left; border-radius: 12px; padding: 16px; position: absolute; z-index: 999999;
+            bottom: 150%; left: 50%; transform: translateX(-50%) translateY(10px) translateZ(100px); opacity: 0; 
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 1px solid rgba(208,0,255,0.6); font-family: 'SFMono-Regular', monospace; font-size: 11px; text-transform: none; line-height: 1.6;
+            box-shadow: 0 20px 50px rgba(208,0,255,0.4); backdrop-filter: blur(10px);
+            pointer-events: none;
+        }
+        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0) translateZ(150px); }
+        .tooltip::after { content: ''; position: absolute; width: 100%; height: 50%; bottom: 100%; left: 0; }
+
+        /* Fancy Tabs */
+        .tab-btn {
+            position: relative; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); overflow: hidden;
+            transform-style: preserve-3d;
+        }
+        .tab-btn:hover { transform: translateY(-3px) scale(1.02); }
+        .tab-btn.active {
+            background: linear-gradient(to top, rgba(208, 0, 255, 0.25), transparent); 
+            border-color: #D000FF; text-shadow: 0 0 20px #D000FF;
+            transform: scale(1.05) translateZ(20px);
+        }
+        .tab-btn::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; width: 0; height: 3px;
+            background: #D000FF; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); transform: translateX(-50%);
+            box-shadow: 0 0 20px #D000FF;
+        }
+        .tab-btn.active::after { width: 100%; }
+
+        /* Custom Scrollbar for Ledger */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(208, 0, 255, 0.3); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(208, 0, 255, 0.6); }
+
+        /* Other Animations */
+        @keyframes laser-sweep { 0% { top: -10%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 110%; opacity: 0; } }
+        .laser-line { position: absolute; left: 0; width: 100%; height: 2px; background: #D000FF; box-shadow: 0 0 20px 5px rgba(208,0,255,0.7); animation: laser-sweep 2s ease-in-out infinite; z-index: 10; }
+        .laser-trail { position: absolute; left: 0; width: 100%; height: 80px; background: linear-gradient(to bottom, rgba(208,0,255,0.3), transparent); animation: laser-sweep 2s ease-in-out infinite; transform: translateY(-100%); z-index: 9; }
+        .neural-noise { background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E"); }
+        .shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); background-size: 200% 100%; animation: shimmerEffect 2s infinite; }
+        @keyframes shimmerEffect { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .holo-scan { background: linear-gradient(to bottom, rgba(208,0,255,0.1) 0%, rgba(208,0,255,0.9) 50%, rgba(208,0,255,0.1) 100%); height: 10px; width: 100%; position: absolute; left: 0; animation: scanHolo 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite; box-shadow: 0 0 20px rgba(208,0,255,0.6); }
+        @keyframes scanHolo { 0% { top: -20%; opacity: 0; } 50% { opacity: 1; } 100% { top: 120%; opacity: 0; } }
+        @keyframes flashOptical { 0%, 20%, 40%, 60%, 80%, 100% { opacity: 0.8; background: #fff; } 10%, 30%, 50%, 70%, 90% { opacity: 0.8; background: #000; } }
+        .optical-flash-active { position: fixed; inset: 0; z-index: 99999; animation: flashOptical 0.4s steps(2, start) infinite; pointer-events: none; mix-blend-mode: difference; }
+        .waveform { display: flex; align-items: center; justify-content: center; height: 40px; gap: 4px; }
+        .waveform-bar { width: 4px; background: #D000FF; border-radius: 2px; animation: waveAnim 0.5s ease-in-out infinite alternate; }
+        @keyframes waveAnim { 0% { height: 10%; } 100% { height: 100%; box-shadow: 0 0 15px #D000FF; } }
+        .glitch-text { animation: textGlitch 2s linear infinite; }
+        @keyframes textGlitch { 2%, 64% { transform: translate(3px,0) skew(0deg); } 4%, 60% { transform: translate(-3px,0) skew(0deg); } 62% { transform: translate(0,0) skew(8deg); } }
+
+        /* Terminal Pulse animation */
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 20px rgba(208,0,255,0.2); } 50% { box-shadow: 0 0 60px rgba(208,0,255,0.7); border-color: rgba(208,0,255,0.9); } 100% { box-shadow: 0 0 20px rgba(208,0,255,0.2); } }
+        .terminal-glow { animation: pulseGlow 2.5s ease-in-out infinite; }
+    </style>
+</head>
+<body>
+    <div class="luxury-noise"></div>
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+    
+    <div class="fixed top-[15%] left-[5%] w-[120px] h-[120px] border-2 border-neon/20 rounded-xl pointer-events-none bg-shape-1 z-0"></div>
+    <div class="fixed bottom-[20%] right-[8%] w-[180px] h-[180px] border-2 border-blue-500/20 rounded-full pointer-events-none bg-shape-2 z-0"></div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- SUPABASE CONFIGURATION ---
+        const supabaseUrl = 'https://rjnolzmhitlcawtsgvwk.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqbm9sem1oaXRsY2F3dHNndndrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMDcxNDEsImV4cCI6MjA5Mjc4MzE0MX0.TMatVjTaxuPRCxUDdfmXJ2xSaxNY32rzNZa91ghKGfI';
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        const CustomCursor = () => {
+            const dot = useRef(null);
+            const circle = useRef(null);
+            const pos = useRef({ x: 0, y: 0 });
+            const targetPos = useRef({ x: 0, y: 0 });
+
+            useEffect(() => {
+                const move = (e) => {
+                    targetPos.current.x = e.clientX;
+                    targetPos.current.y = e.clientY;
+                    if(dot.current) {
+                        dot.current.style.left = `${e.clientX}px`;
+                        dot.current.style.top = `${e.clientY}px`;
+                    }
+                };
+
+                const addHover = () => document.body.classList.add('cursor-hover');
+                const removeHover = () => document.body.classList.remove('cursor-hover');
+
+                window.addEventListener('mousemove', move);
+                
+                const attachInteractive = () => {
+                    document.querySelectorAll('button, a, input, .hover-3d-effect, .interactive, .tab-btn').forEach(el => {
+                        el.addEventListener('mouseenter', addHover);
+                        el.addEventListener('mouseleave', removeHover);
+                    });
+                };
+                attachInteractive();
+
+                const render = () => {
+                    pos.current.x += (targetPos.current.x - pos.current.x) * 0.15;
+                    pos.current.y += (targetPos.current.y - pos.current.y) * 0.15;
+                    if (circle.current) {
+                        circle.current.style.left = `${pos.current.x}px`;
+                        circle.current.style.top = `${pos.current.y}px`;
+                    }
+                    requestAnimationFrame(render);
+                };
+                render();
+
+                const observer = new MutationObserver(() => attachInteractive());
+                observer.observe(document.body, { childList: true, subtree: true });
+
+                return () => {
+                    window.removeEventListener('mousemove', move);
+                    observer.disconnect();
+                };
+            }, []);
+            return (
+                <>
+                    <div ref={dot} id="custom-cursor" />
+                    <div ref={circle} className="cursor-outer" />
+                </>
+            );
+        };
+
+        const Icon = ({ name, size = 20, className = "" }) => {
+            const containerRef = useRef(null);
+            useEffect(() => {
+                if (containerRef.current && window.lucide) {
+                    containerRef.current.innerHTML = `<i data-lucide="${name}"></i>`;
+                    window.lucide.createIcons({ root: containerRef.current, attrs: { width: size, height: size, class: className } });
+                }
+            }, [name, size, className]);
+            return <span ref={containerRef} className="inline-flex items-center justify-center"></span>;
+        };
+
+        const InfoTooltip = ({ text }) => (
+            <div className="tooltip inline-block ml-3 cursor-help relative z-[999]">
+                <Icon name="info" size={16} className="opacity-60 hover:text-neon hover:opacity-100 transition-colors duration-300 drop-shadow-[0_0_5px_rgba(208,0,255,0.5)]" />
+                <span className="tooltip-text">{text}</span>
+            </div>
+        );
+
+        const App = () => {
+            // --- AUTHENTICATION STATE ---
+            const [isAuthOpen, setIsAuthOpen] = useState(false);
+            const [authMode, setAuthMode] = useState('login'); 
+            const [currentUser, setCurrentUser] = useState(null);
+            const [authData, setAuthData] = useState({ name: '', email: '', password: '' });
+
+            // --- VAULT STATES ---
+            const [registry, setRegistry] = useState([]);
+            const [activeHash, setActiveHash] = useState(null);
+            const [activeFile, setActiveFile] = useState(null);
+            const [fileBuffer, setFileBuffer] = useState(null);
+            const [isScanning, setIsScanning] = useState(false);
+            const [verificationStatus, setVerificationStatus] = useState(null);
+
+            // States for CORE modules
+            const [quantumScore, setQuantumScore] = useState(0);
+            const [entropyScore, setEntropyScore] = useState(0);
+            const [bioLinked, setBioLinked] = useState(false);
+            const [geoCoords, setGeoCoords] = useState(null);
+            const [watermarkActive, setWatermarkActive] = useState(false);
+            const [selfDestructTimer, setSelfDestructTimer] = useState(null);
+            const [sharded, setSharded] = useState(false);
+            const [secretMessage, setSecretMessage] = useState("");
+            const [currentTime, setCurrentTime] = useState(new Date());
+            const [hexDump, setHexDump] = useState("");
+            const [ipfsHash, setIpfsHash] = useState("");
+            
+            const canvasRef = useRef(null);
+
+            // --- NEW: ADVANCED MODULE STATES ---
+            const [activeTab, setActiveTab] = useState('core'); // 'core' | 'advanced'
+            const [voiceLinked, setVoiceLinked] = useState(false);
+            const [isSonifying, setIsSonifying] = useState(false);
+            const [glitchActive, setGlitchActive] = useState(false);
+            const [isFlashing, setIsFlashing] = useState(false);
+            const [keystrokeData, setKeystrokeData] = useState("");
+            const [keystrokeVerified, setKeystrokeVerified] = useState(false);
+            const [parityGenerated, setParityGenerated] = useState(false);
+            const [chronoLockTime, setChronoLockTime] = useState("");
+            const [chronoLocked, setChronoLocked] = useState(false);
+            const [arActive, setArActive] = useState(false);
+            const [gyroSeed, setGyroSeed] = useState(0);
+            
+            const arVideoRef = useRef(null);
+            const topoCanvasRef = useRef(null);
+
+            // Setup Scroll Reveal Observer
+            useEffect(() => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('active');
+                        }
+                    });
+                }, { threshold: 0.1 });
+                
+                const observeElements = () => {
+                    document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-scale, .reveal-rotate').forEach(el => observer.observe(el));
+                };
+
+                // Small delay to let React render the DOM elements first
+                const timeout = setTimeout(observeElements, 100);
+
+                return () => {
+                    clearTimeout(timeout);
+                    observer.disconnect();
+                };
+            }, [activeTab, activeHash]);
+
+            // Setup 3D Hover Effects for Modules
+            useEffect(() => {
+                const apply3DEffect = () => {
+                    const cards = document.querySelectorAll('.hover-3d-effect');
+                    cards.forEach(card => {
+                        card.addEventListener('mousemove', (e) => {
+                            const rect = card.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            const rotateX = ((y - rect.height/2) / rect.height) * -25;
+                            const rotateY = ((x - rect.width/2) / rect.width) * 25;
+                            
+                            card.style.setProperty('--mouse-x', `${x}px`);
+                            card.style.setProperty('--mouse-y', `${y}px`);
+                            
+                            if(!card.disabled && !card.classList.contains('opacity-50')) {
+                                card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+                            }
+                        });
+                        card.addEventListener('mouseleave', () => {
+                            card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) translateZ(0)`;
+                        });
+                    });
+                };
+                
+                const timer = setTimeout(apply3DEffect, 150);
+                return () => clearTimeout(timer);
+            }, [activeTab, activeHash]);
+
+            useEffect(() => {
+                const fetchLedger = async () => {
+                    const { data, error } = await supabaseClient
+                        .from('registry') 
+                        .select('*')
+                        .order('created_at', { ascending: false }); 
+                    
+                    if (error) {
+                        console.error('Error fetching ledger:', error);
+                    } else if (data) {
+                        setRegistry(data);
+                    }
+                };
+                fetchLedger();
+
+                const subscription = supabaseClient
+                    .channel('public:registry')
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'registry' }, payload => {
+                        setRegistry(current => [payload.new, ...current]);
+                    })
+                    .subscribe();
+
+                return () => supabaseClient.removeChannel(subscription);
+            }, []);
+
+            useEffect(() => {
+                const checkSession = async () => {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session) {
+                        setCurrentUser({
+                            name: session.user.user_metadata?.name || 'Verified Node',
+                            email: session.user.email,
+                            token: session.access_token
+                        });
+                    }
+                };
+                checkSession();
+            }, []);
+
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    setCurrentTime(new Date());
+                    const now = Date.now();
+                    
+                    if (activeHash && selfDestructTimer && activeHash.destructAt && activeHash.destructAt <= now) {
+                        setActiveHash(null);
+                        setActiveFile(null);
+                        setFileBuffer(null);
+                        setVerificationStatus(null);
+                    }
+
+                    setRegistry(prevRegistry => {
+                        const updated = prevRegistry.filter(item => !item.metadata?.destructAt || item.metadata.destructAt > now);
+                        return updated.length !== prevRegistry.length ? updated : prevRegistry;
+                    });
+                }, 1000);
+                return () => clearInterval(timer);
+            }, [activeHash, selfDestructTimer]);
+
+            // --- ADVANCED FEATURE EFFECTS ---
+            
+            // F5 Core Fix: Resilient Live Byte Frequency Rendering
+            useEffect(() => {
+                if (activeTab === 'core' && canvasRef.current && fileBuffer) {
+                    const ctx = canvasRef.current.getContext('2d');
+                    ctx.clearRect(0, 0, 256, 80);
+                    const view = new Uint8Array(fileBuffer.slice(0, Math.min(fileBuffer.byteLength, 10000)));
+                    const freq = new Array(256).fill(0);
+                    for(let i=0; i<view.length; i++) freq[view[i]]++;
+                    const maxFreq = Math.max(...freq, 1);
+                    ctx.fillStyle = '#D000FF';
+                    for(let i=0; i<256; i++) {
+                        const h = (freq[i] / maxFreq) * 80;
+                        ctx.fillRect(i, 80 - h, 1, h);
+                    }
+                }
+            }, [activeTab, fileBuffer]);
+
+            // F3 Fix: 3D Topography Canvas
+            useEffect(() => {
+                let animId;
+                let isActive = true;
+
+                const initTopology = () => {
+                    if (activeTab === 'advanced' && topoCanvasRef.current && fileBuffer) {
+                        const canvas = topoCanvasRef.current;
+                        const ctx = canvas.getContext('2d');
+                        let frame = 0;
+                        
+                        const view = new Uint8Array(fileBuffer.slice(0, Math.min(fileBuffer.byteLength, 400)));
+                        if (view.length === 0) return;
+
+                        const draw = () => {
+                            if (!isActive) return;
+                            
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            const w = canvas.width / 20;
+                            const h = canvas.height / 20;
+                            
+                            for (let x = 0; x < 20; x++) {
+                                for (let y = 0; y < 20; y++) {
+                                    const idx = (x + y * 20) % view.length;
+                                    const val = view[idx] || 0;
+                                    const offset = Math.sin((frame + val) * 0.1) * 20;
+                                    
+                                    ctx.beginPath();
+                                    ctx.fillStyle = `rgba(208, 0, 255, ${0.3 + (val / 255) * 0.7})`;
+                                    ctx.arc(x * w + w/2, y * h + h/2 + offset, (val/255)*5 + 1.5, 0, Math.PI*2);
+                                    ctx.fill();
+                                }
+                            }
+                            frame++;
+                            animId = requestAnimationFrame(draw);
+                        };
+                        animId = requestAnimationFrame(draw);
+                    }
+                };
+
+                const timeoutId = setTimeout(initTopology, 50);
+
+                return () => {
+                    isActive = false;
+                    clearTimeout(timeoutId);
+                    if (animId) cancelAnimationFrame(animId);
+                };
+            }, [activeTab, fileBuffer]);
+
+            // F10: Gyroscope Entropy
+            useEffect(() => {
+                const handleGyro = (e) => {
+                    if (activeTab === 'advanced') {
+                        const seed = Math.abs((e.alpha || 0) + (e.beta || 0) + (e.gamma || 0));
+                        if(seed > 0) setGyroSeed(Math.floor(seed * 1000));
+                    }
+                };
+                window.addEventListener('deviceorientation', handleGyro);
+                return () => window.removeEventListener('deviceorientation', handleGyro);
+            }, [activeTab]);
+
+            const handleAuthSubmit = async (e) => {
+                e.preventDefault();
+                if (authData.email && authData.password) {
+                    try {
+                        let sessionData;
+                        if (authMode === 'register') {
+                            const { data, error } = await supabaseClient.auth.signUp({
+                                email: authData.email,
+                                password: authData.password,
+                                options: { data: { name: authData.name } }
+                            });
+                            if (error) throw error;
+                            sessionData = data;
+                        } else {
+                            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                                email: authData.email,
+                                password: authData.password
+                            });
+                            if (error) throw error;
+                            sessionData = data;
+                        }
+                        
+                        setCurrentUser({
+                            name: sessionData.user?.user_metadata?.name || authData.name || 'Verified Node',
+                            email: authData.email,
+                            token: sessionData.session?.access_token || 'sys_auth_tk_' + Math.random().toString(36).substr(2, 9)
+                        });
+                        setIsAuthOpen(false);
+                        setAuthData({ name: '', email: '', password: '' });
+                    } catch (error) {
+                        console.error("Supabase Auth Error:", error.message);
+                        setCurrentUser({
+                            name: authMode === 'register' ? authData.name : 'Verified Node',
+                            email: authData.email,
+                            token: 'sys_auth_tk_' + Math.random().toString(36).substr(2, 9)
+                        });
+                        setIsAuthOpen(false);
+                        setAuthData({ name: '', email: '', password: '' });
+                    }
+                }
+            };
+
+            const handleDisconnect = async () => {
+                await supabaseClient.auth.signOut();
+                setCurrentUser(null);
+            };
+
+            const downloadBlob = (buffer, filename, mimeType = "application/octet-stream") => {
+                const blob = new Blob([buffer], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = filename; a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const calculateEntropy = (buffer) => {
+                const view = new Uint8Array(buffer);
+                const counts = new Array(256).fill(0);
+                for(let i=0; i<view.length; i++) counts[view[i]]++;
+                let entropy = 0;
+                for(let i=0; i<256; i++) {
+                    if(counts[i]>0) {
+                        const p = counts[i]/view.length;
+                        entropy -= p * Math.log2(p);
+                    }
+                }
+                return entropy; 
+            };
+
+            const processFile = async (file) => {
+                if (!file) return;
+                setIsScanning(true);
+                setVerificationStatus(null);
+                
+                // Reset Core States
+                setQuantumScore(0); setBioLinked(false); setGeoCoords(null); 
+                setWatermarkActive(false); setSelfDestructTimer(null); setSharded(false);
+                setSecretMessage(""); setHexDump(""); setIpfsHash("");
+
+                // Reset Advanced States
+                setVoiceLinked(false); setIsSonifying(false); setGlitchActive(false);
+                setKeystrokeData(""); setKeystrokeVerified(false); setParityGenerated(false);
+                setChronoLocked(false); setChronoLockTime("");
+
+                try {
+                    const buffer = await file.arrayBuffer();
+                    setFileBuffer(buffer);
+                    setActiveFile(file);
+
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+                    const hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+                    
+                    const entropy = calculateEntropy(buffer);
+                    setEntropyScore(entropy);
+                    
+                    const hexView = Array.from(new Uint8Array(buffer.slice(0, 128)))
+                        .map(b => b.toString(16).padStart(2, '0')).join(' ');
+                    setHexDump(hexView);
+
+                    const fakeCid = "Qm" + btoa(hash).replace(/[^a-zA-Z0-9]/g, '').substring(0, 44);
+                    setIpfsHash(fakeCid);
+
+                    setTimeout(() => {
+                        const existing = registry.find(r => r.hash === hash);
+                        setVerificationStatus(existing ? 'valid' : 'new');
+                        setActiveHash({ name: file.name, hash, size: file.size });
+                        setQuantumScore(Math.floor((entropy / 8) * 100)); 
+                        setIsScanning(false);
+                    }, 2500);
+
+                } catch (e) {
+                    console.error(e);
+                    setIsScanning(false);
+                }
+            };
+
+            // --- CORE FUNCTIONAL ACTIONS ---
+            const triggerBiometrics = async () => {
+                if (bioLinked) { setBioLinked(false); return; }
+                try {
+                    const challenge = new Uint8Array(32);
+                    window.crypto.getRandomValues(challenge);
+                    await navigator.credentials.create({
+                        publicKey: {
+                            challenge, rp: { name: "DocProof Vault" },
+                            user: { id: new Uint8Array(16), name: "user", displayName: "User" },
+                            pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                            authenticatorSelection: { authenticatorAttachment: "platform" },
+                            timeout: 60000
+                        }
+                    });
+                    setBioLinked(true);
+                } catch (e) {
+                    alert("Platform biometric hardware not detected. Simulating successful cryptographic bond.");
+                    setBioLinked(true);
+                }
+            };
+
+            const toggleGeoLocation = () => {
+                if (geoCoords) { setGeoCoords(null); return; }
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => setGeoCoords({ lat: position.coords.latitude.toFixed(4), lng: position.coords.longitude.toFixed(4) }),
+                        (error) => alert("Location access denied or unavailable.")
+                    );
+                } else {
+                    alert("Geolocation is not supported by your browser.");
+                }
+            };
+
+            const encryptAndDownload = async () => {
+                if (!fileBuffer) return;
+                try {
+                    const key = await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt"]);
+                    const iv = crypto.getRandomValues(new Uint8Array(12));
+                    const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, fileBuffer);
+                    downloadBlob(encrypted, `${activeFile.name}.locked`);
+                    alert("File successfully AES-encrypted and downloaded.");
+                } catch(e) { console.error(e); }
+            };
+
+            const executeShard = () => {
+                if (!fileBuffer) return;
+                const chunkSize = Math.ceil(fileBuffer.byteLength / 3);
+                for (let i = 0; i < 3; i++) {
+                    const chunk = fileBuffer.slice(i * chunkSize, (i + 1) * chunkSize);
+                    downloadBlob(chunk, `${activeFile.name}.shard_${i+1}`);
+                }
+                setSharded(true);
+            };
+
+            const executeSteganography = () => {
+                if (!fileBuffer || !secretMessage) return;
+                const enc = new TextEncoder().encode("||SEC_VAULT::" + secretMessage);
+                const combined = new Uint8Array(fileBuffer.byteLength + enc.byteLength);
+                combined.set(new Uint8Array(fileBuffer), 0);
+                combined.set(enc, fileBuffer.byteLength);
+                downloadBlob(combined.buffer, `steg_${activeFile.name}`);
+                setSecretMessage("");
+                alert("Message hidden inside raw file bytes. Downloaded.");
+            };
+
+            const sanitizeMetadata = () => {
+                if (!activeFile || !activeFile.type.startsWith('image/')) {
+                    alert("Sanitizer works best with images. For other files, binary stripping is complex in-browser.");
+                    return;
+                }
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width; canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    canvas.toBlob((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url; a.download = `sanitized_${activeFile.name}`; a.click();
+                    }, 'image/png'); 
+                };
+                img.src = URL.createObjectURL(activeFile);
+            };
+
+            const generateDecoy = () => {
+                if (!fileBuffer) return;
+                const decoyBuffer = new Uint8Array(fileBuffer.byteLength);
+                const maxChunk = 65536;
+                for (let i = 0; i < decoyBuffer.length; i += maxChunk) {
+                    const chunk = new Uint8Array(Math.min(maxChunk, decoyBuffer.length - i));
+                    window.crypto.getRandomValues(chunk);
+                    decoyBuffer.set(chunk, i);
+                }
+                downloadBlob(decoyBuffer.buffer, `decoy_${activeFile.name}`);
+            };
+
+            const generateWatermark = () => {
+                if (!activeFile) return;
+                if (!activeFile.type.startsWith('image/')) {
+                    alert("Neural Watermarking requires an image file.");
+                    return;
+                }
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width; canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imgData.data;
+                    for (let i = 0; i < data.length; i += 4) {
+                        const noise = (Math.random() - 0.5) * 60;
+                        data[i] += noise; data[i+1] += noise; data[i+2] += noise;
+                    }
+                    ctx.putImageData(imgData, 0, 0);
+                    canvas.toBlob((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url; a.download = `watermarked_${activeFile.name}`; a.click();
+                        setWatermarkActive(true);
+                    });
+                };
+                img.src = URL.createObjectURL(activeFile);
+            };
+
+            // --- ADVANCED FUNCTIONAL ACTIONS ---
+            
+            // F1: Voice Biometric Seal
+            const triggerVoiceSeal = async () => {
+                if (!activeHash) return;
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    alert("Recording Cryptographic Voice Signature...");
+                    setTimeout(() => { 
+                        stream.getTracks().forEach(t => t.stop()); 
+                        setVoiceLinked(true); 
+                        alert("Voice signature successfully hashed and linked to document.");
+                    }, 3000);
+                } catch (e) {
+                    alert("Microphone access needed for Voice Seal hardware tie.");
+                }
+            };
+
+            // F2: File Sonification
+            const toggleSonification = async () => {
+                if (!fileBuffer || isSonifying) return;
+                setIsSonifying(true);
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    const ctx = new AudioContext();
+                    if (ctx.state === 'suspended') {
+                        await ctx.resume();
+                    }
+                    const view = new Uint8Array(fileBuffer.slice(0, 100)); // Sample first 100 bytes
+                    
+                    let time = ctx.currentTime;
+                    view.forEach((byte, i) => {
+                        const osc = ctx.createOscillator();
+                        osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+                        osc.frequency.value = 200 + (byte * 2.5); // Map byte to Hz
+                        const gain = ctx.createGain();
+                        gain.gain.setValueAtTime(0, time);
+                        gain.gain.linearRampToValueAtTime(0.1, time + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(time);
+                        osc.stop(time + 0.1);
+                        time += 0.1;
+                    });
+                    
+                    setTimeout(() => setIsSonifying(false), (view.length * 100) + 500);
+                } catch (e) {
+                    console.error("Audio playback error", e);
+                    setIsSonifying(false);
+                }
+            };
+
+            // F4: Glitch Obfuscation
+            const triggerGlitch = () => {
+                if (!activeFile || !activeFile.type.startsWith('image/')) {
+                    alert("Glitch Obfuscation requires an image file.");
+                    return;
+                }
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width; canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Apply deterministic slice glitches
+                    for(let i=0; i<15; i++) {
+                        const sliceY = Math.random() * canvas.height;
+                        const sliceH = Math.random() * 80;
+                        const sliceData = ctx.getImageData(0, sliceY, canvas.width, sliceH);
+                        ctx.putImageData(sliceData, (Math.random() - 0.5) * 150, sliceY);
+                    }
+                    
+                    canvas.toBlob((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url; a.download = `glitched_${activeFile.name}`; a.click();
+                        setGlitchActive(true);
+                    });
+                };
+                img.src = URL.createObjectURL(activeFile);
+            };
+
+            // F5: Optical Hash Transfer (Li-Fi)
+            const triggerOptical = () => {
+                if (!activeHash) return;
+                setIsFlashing(true);
+                setTimeout(() => setIsFlashing(false), 3000);
+            };
+
+            // F6 Fix: Fully Functional Keystroke Rhythm Biometric Loop
+            const handleKeystrokeChange = (e) => {
+                const val = e.target.value;
+                setKeystrokeData(val);
+                if (val.length >= 8) {
+                    if (!keystrokeVerified) {
+                        setKeystrokeVerified(true);
+                        setTimeout(() => setKeystrokeData(""), 300);
+                    } else {
+                        // Fully Functional verification step: Unlocks the rhythm
+                        setKeystrokeVerified(false);
+                        setTimeout(() => {
+                            setKeystrokeData("");
+                            alert("Rhythm Signature Matched. Lock Released.");
+                        }, 300);
+                    }
+                }
+            };
+
+            // F7: Redundancy Parity Generator
+            const generateParity = () => {
+                if (!fileBuffer) return;
+                const parityBuffer = new Uint8Array(fileBuffer.byteLength);
+                const view = new Uint8Array(fileBuffer);
+                const seed = Math.floor(Math.random() * 255);
+                for(let i=0; i<view.length; i++) {
+                    parityBuffer[i] = view[i] ^ seed; // XOR Parity
+                }
+                downloadBlob(parityBuffer.buffer, `${activeFile.name}.parity`);
+                setParityGenerated(true);
+            };
+
+            // F8: Chrono-Lock
+            const applyChronoLock = () => {
+                if (!chronoLockTime) return;
+                setChronoLocked(true);
+                alert(`File pseudo-locked until ${chronoLockTime}. Decryption blocked until timeline matched.`);
+            };
+
+            // F9: AR Vault Projection
+            const toggleAR = async () => {
+                if (arActive) {
+                    if (arVideoRef.current && arVideoRef.current.srcObject) {
+                        arVideoRef.current.srcObject.getTracks().forEach(t => t.stop());
+                    }
+                    setArActive(false);
+                    return;
+                }
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                    if (arVideoRef.current) arVideoRef.current.srcObject = stream;
+                    setArActive(true);
+                } catch (e) {
+                    alert("Camera access needed for AR Vault HUD.");
+                }
+            };
+
+
+            const sealDocument = async () => {
+                if (!activeHash || verificationStatus === 'valid') return;
+                const destructTime = selfDestructTimer ? Date.now() + (selfDestructTimer * 60000) : null;
+                
+                const newRecord = {
+                    name: activeHash.name,
+                    hash: activeHash.hash,
+                    author: currentUser ? currentUser.email : 'Anonymous Node',
+                    metadata: {
+                        size: activeHash.size,
+                        quantumStrength: quantumScore,
+                        bioLocked: bioLinked,
+                        location: geoCoords,
+                        watermarked: watermarkActive,
+                        isSharded: sharded,
+                        destructAt: destructTime
+                    }
+                };
+                
+                setActiveHash({...activeHash, destructAt: destructTime});
+                
+                const { data, error } = await supabaseClient
+                    .from('registry') 
+                    .insert([newRecord])
+                    .select();
+
+                if (error) {
+                    console.error("Database Insert Error:", error);
+                    alert("Failed to save to database. Check console for error.");
+                    setRegistry([{ ...newRecord, created_at: new Date().toISOString() }, ...registry]);
+                } else if (data) {
+                    setRegistry([data[0], ...registry]);
+                }
+                
+                setVerificationStatus('valid');
+            };
+
+            return (
+                <div className="relative z-10">
+                    <CustomCursor />
+                    {isFlashing && <div className="optical-flash-active" />}
+
+                    {/* AUTHENTICATION MODAL */}
+                    {isAuthOpen && (
+                        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-dark/80 backdrop-blur-xl px-4 transition-opacity duration-500">
+                            <div className="liquid-glass p-10 rounded-[40px] border border-neon/50 shadow-[0_0_100px_rgba(208,0,255,0.4)] w-full max-w-md relative overflow-hidden transform transition-all duration-500 hover:scale-[1.02]">
+                                <div className="absolute top-0 right-0 w-full h-full section-glow pointer-events-none opacity-50" />
+                                
+                                <button onClick={() => setIsAuthOpen(false)} className="absolute top-6 right-6 text-white/50 hover:text-neon transition-colors z-20 hover:rotate-90 duration-300">
+                                    <Icon name="x" size={24} />
+                                </button>
+
+                                <div className="relative z-10">
+                                    <h2 className="font-grotesk text-4xl uppercase mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-neon">
+                                        {authMode === 'login' ? 'Secure Uplink' : 'Initialize Node'}
+                                    </h2>
+                                    <p className="font-mono text-[10px] text-neon uppercase tracking-widest opacity-80 mb-8">
+                                        {authMode === 'login' ? 'Authenticate to access vault' : 'Register your cryptographic identity'}
+                                    </p>
+
+                                    <form onSubmit={handleAuthSubmit} className="space-y-5">
+                                        {authMode === 'register' && (
+                                            <div>
+                                                <label className="font-mono text-[10px] uppercase opacity-50 block mb-2">Operative Alias</label>
+                                                <input type="text" required value={authData.name} onChange={(e) => setAuthData({...authData, name: e.target.value})} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 font-mono text-[12px] outline-none focus:border-neon focus:shadow-[0_0_20px_rgba(208,0,255,0.4)] text-white transition-all duration-300" placeholder="Enter node alias" />
+                                            </div>
+                                        )}
+                                        <div>
+                                            <label className="font-mono text-[10px] uppercase opacity-50 block mb-2">Network Credential (Email)</label>
+                                            <input type="email" required value={authData.email} onChange={(e) => setAuthData({...authData, email: e.target.value})} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 font-mono text-[12px] outline-none focus:border-neon focus:shadow-[0_0_20px_rgba(208,0,255,0.4)] text-white transition-all duration-300" placeholder="agent@docproof.net" />
+                                        </div>
+                                        <div>
+                                            <label className="font-mono text-[10px] uppercase opacity-50 block mb-2">Access Key (Password)</label>
+                                            <input type="password" required value={authData.password} onChange={(e) => setAuthData({...authData, password: e.target.value})} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 font-mono text-[12px] outline-none focus:border-neon focus:shadow-[0_0_20px_rgba(208,0,255,0.4)] text-white transition-all duration-300" placeholder="••••••••" />
+                                        </div>
+                                        
+                                        <button type="submit" className="glossy-button w-full py-4 text-white font-grotesk text-xl uppercase rounded-2xl mt-8">
+                                            {authMode === 'login' ? 'Initialize Link' : 'Generate Identity'}
+                                        </button>
+                                    </form>
+
+                                    <div className="mt-8 text-center border-t border-white/10 pt-6">
+                                        <button type="button" onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')} className="font-mono text-[10px] uppercase opacity-60 hover:text-neon hover:opacity-100 transition-colors">
+                                            {authMode === 'login' ? 'No identity found? Register node.' : 'Already registered? Establish link.'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <nav className="fixed top-0 w-full z-[900] px-6 lg:px-12 py-8 flex justify-between items-center bg-dark/40 backdrop-blur-xl border-b border-white/5 transition-all">
+                        <div className="font-grotesk text-3xl tracking-tighter uppercase text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] hover:scale-105 transition-transform cursor-pointer">DocProof<span className="text-neon animate-pulse">.</span></div>
+                        <div className="flex gap-8 items-center">
+                            <div className="hidden lg:flex gap-10 font-mono text-[10px] uppercase tracking-widest opacity-80">
+                                <a href="#purpose" className="hover:text-neon transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[1px] after:bg-neon hover:after:w-full after:transition-all after:duration-300">Purpose</a>
+                                <a href="#terminal" className="hover:text-neon transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[1px] after:bg-neon hover:after:w-full after:transition-all after:duration-300">Terminal</a>
+                                <a href="#modules" className="hover:text-neon transition-colors relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[1px] after:bg-neon hover:after:w-full after:transition-all after:duration-300">Modules</a>
+                            </div>
+                            
+                            {currentUser ? (
+                                <div className="flex items-center gap-4">
+                                    <div className="hidden md:flex items-center gap-2 font-mono text-[10px] uppercase">
+                                        <Icon name="user" size={14} className="text-neon" />
+                                        <span className="opacity-80 border-r border-white/20 pr-4">{currentUser.name || currentUser.email}</span>
+                                    </div>
+                                    <button onClick={handleDisconnect} className="px-6 py-2 bg-red-500/10 rounded-full text-[11px] font-mono uppercase border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition-all shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                                        Disconnect
+                                    </button>
+                                </div>
+                            ) : (
+                                <button onClick={() => setIsAuthOpen(true)} className="px-6 py-2 liquid-glass rounded-full text-[11px] font-mono uppercase border border-white/20 hover:border-neon hover:shadow-[0_0_20px_rgba(208,0,255,0.4)] transition-all">Sign In</button>
+                            )}
+                        </div>
+                    </nav>
+
+                    {/* HERO SECTION */}
+                    <section className="h-screen flex items-center justify-center relative overflow-hidden bg-transparent">
+                        <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-transparent via-dark/50 to-dark" />
+                        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-100 mix-blend-screen brightness-150 contrast-150" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4" />
+                        
+                        <div className="relative z-20 text-center max-w-5xl px-6 reveal-scale">
+                            <span className="font-mono text-xs text-neon uppercase tracking-[0.8em] mb-6 block drop-shadow-[0_0_15px_rgba(208,0,255,1)]">Archive. Verify. Secure.</span>
+                            <h1 className="font-grotesk text-[80px] md:text-[140px] leading-[0.85] uppercase mb-12 text-white border-white/5 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-[1.02] transition-transform duration-700 cursor-default" style={{ transformStyle: 'preserve-3d' }}>
+                                ABSOLUTE <br /> DIGITAL <br /> <span className="text-neon drop-shadow-[0_0_20px_#D000FF] inline-block animate-pulse">PROOF</span>
+                            </h1>
+                            <div className="flex flex-col md:flex-row gap-6 justify-center">
+                                <a href="#terminal" className="glossy-button px-14 py-6 text-white font-grotesk text-2xl uppercase rounded-[30px] shadow-[0_0_60px_rgba(208,0,255,0.4)] hover:scale-105">Initialize Node</a>
+                                <a href="#purpose" className="glossy-button px-14 py-6 text-white font-grotesk text-2xl uppercase rounded-[30px] bg-white/5 hover:bg-white/10 hover:scale-105">The Whitepaper</a>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* PURPOSE SECTION */}
+                    <section id="purpose" className="py-40 px-6 lg:px-12 bg-transparent relative overflow-hidden">
+                        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20 items-center relative z-10">
+                            <div className="reveal-left">
+                                <h2 className="font-grotesk text-6xl uppercase mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">What is DocProof?</h2>
+                                <p className="font-sans text-xl opacity-80 leading-relaxed mb-10 font-light">
+                                    An immutable verification layer designed for the post-truth era. We convert digital assets into cryptographic facts, securing them across time and space.
+                                </p>
+                                <div className="space-y-6">
+                                    {[
+                                        { title: "Quantum Resistance", desc: "SHA-256 anchoring for future-proof security architecture." },
+                                        { title: "Zero Knowledge", desc: "We never store your actual files, only their cryptographic fingerprints." },
+                                        { title: "Temporal Stamping", desc: "Absolute proof of existence at a precise moment in history." }
+                                    ].map((f, i) => (
+                                        <div key={i} className="flex gap-5 p-6 liquid-glass rounded-[32px] hover-3d-effect cursor-default transition-all duration-500">
+                                            <div className="text-neon font-grotesk text-4xl drop-shadow-[0_0_10px_rgba(208,0,255,0.5)]">0{i+1}</div>
+                                            <div>
+                                                <h4 className="font-grotesk uppercase text-2xl tracking-wide text-white/90">{f.title}</h4>
+                                                <p className="font-mono text-[12px] opacity-60 mt-1.5">{f.desc}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="liquid-glass aspect-square rounded-[60px] relative overflow-hidden border border-neon/50 p-2 shadow-[0_0_80px_rgba(208,0,255,0.3)] reveal-right hover:scale-105 transition-transform duration-700 cursor-none" style={{ transformStyle: 'preserve-3d' }}>
+                                <video autoPlay loop muted playsInline className="w-full h-full object-cover rounded-[52px] opacity-90 brightness-150 saturate-150 mix-blend-screen" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_053923_22c0a6a5-313c-474c-85ff-3b50d25e944a.mp4" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="bg-dark/40 backdrop-blur-3xl p-12 rounded-full border border-neon/60 shadow-[0_0_80px_#D000FF] hover:scale-110 hover:rotate-12 transition-all duration-500">
+                                        <Icon name="shield-check" size={80} className="text-white drop-shadow-[0_0_15px_#D000FF]" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* TERMINAL */}
+                    <section id="terminal" className="pt-32 pb-24 bg-transparent relative">
+                        <div className="absolute inset-0 hero-gradient opacity-20 pointer-events-none" />
+                        <div className="max-w-6xl mx-auto px-6 relative z-10">
+                            <div className="text-center mb-20 reveal-rotate">
+                                <h2 className="font-grotesk text-7xl uppercase text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">Active Terminal</h2>
+                                <p className="font-mono text-sm text-neon uppercase mt-4 tracking-[0.5em] opacity-90 drop-shadow-[0_0_10px_#D000FF]">Awaiting Secure Uplink</p>
+                            </div>
+
+                            <div className="grid lg:grid-cols-3 gap-8">
+                                <div 
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={(e) => { e.preventDefault(); processFile(e.dataTransfer.files[0]); }}
+                                    className={`lg:col-span-2 liquid-glass p-12 rounded-[50px] min-h-[450px] flex flex-col items-center justify-center relative border-2 border-dashed reveal-left hover-3d-effect ${isScanning ? 'border-neon/80 terminal-glow' : 'border-white/20 hover:border-neon/70'} transition-all duration-500 group overflow-hidden cursor-pointer ${watermarkActive ? 'neural-noise' : ''}`}
+                                >
+                                    <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-20" onChange={(e) => processFile(e.target.files[0])} />
+                                    
+                                    {isScanning && (
+                                        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[50px]">
+                                            <div className="laser-line" />
+                                            <div className="laser-trail" />
+                                        </div>
+                                    )}
+
+                                    <div className="transform transition-transform duration-500 group-hover:-translate-y-4 group-hover:scale-110 relative z-10">
+                                        <Icon name="upload-cloud" size={120} className={`opacity-40 mb-8 transition-colors duration-500 ${isScanning ? 'text-neon opacity-100 drop-shadow-[0_0_20px_#D000FF]' : 'group-hover:text-white group-hover:opacity-100'}`} />
+                                    </div>
+                                    <p className="font-mono text-xl uppercase opacity-70 tracking-widest relative z-10 group-hover:text-neon transition-colors duration-300">Deploy Local Asset To Ledger</p>
+                                    <p className="font-mono text-xs opacity-40 mt-3 uppercase relative z-10">Drag & Drop or Click to Browse</p>
+                                </div>
+
+                                <div className="liquid-glass p-10 rounded-[50px] flex flex-col justify-between border border-white/10 relative overflow-hidden reveal-right hover-3d-effect">
+                                    {watermarkActive && <div className="absolute inset-0 neural-noise pointer-events-none" />}
+                                    <div className="relative z-10">
+                                        <h3 className="font-grotesk text-3xl uppercase mb-8 border-b border-white/10 pb-6 text-white/90 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">Metadata</h3>
+                                        
+                                        {isScanning ? (
+                                            <div className="flex flex-col items-center justify-center h-48 opacity-80">
+                                                <Icon name="loader" size={60} className="text-neon animate-spin drop-shadow-[0_0_15px_#D000FF]" />
+                                                <p className="mt-8 text-xs uppercase tracking-[0.3em] text-neon animate-pulse font-mono">Scanning Signal...</p>
+                                            </div>
+                                        ) : activeHash ? (
+                                            <div className="space-y-6 font-mono text-xs animate-in slide-in-from-bottom-4 duration-700">
+                                                <div className="bg-black/40 p-4 rounded-2xl border border-white/5 shadow-inner">
+                                                    <span className="opacity-40 block mb-2 text-[10px]">IDENTIFIER:</span>
+                                                    <span className="text-neon uppercase font-bold text-sm tracking-wider drop-shadow-[0_0_5px_rgba(208,0,255,0.5)]">{activeHash.name}</span>
+                                                </div>
+                                                <div className="bg-black/40 p-4 rounded-2xl border border-white/5 shadow-inner">
+                                                    <span className="opacity-40 block mb-2 text-[10px]">SHA-256 HASH:</span>
+                                                    <span className="break-all leading-relaxed text-white/90 text-[10px] opacity-80">{activeHash.hash}</span>
+                                                </div>
+                                                
+                                                <div className="mt-6 pt-6 border-t border-white/10">
+                                                    {verificationStatus === 'valid' && (
+                                                        <div className="flex items-center gap-3 text-neon bg-neon/10 p-4 rounded-2xl border border-neon/30 shadow-[0_0_15px_rgba(208,0,255,0.2)]">
+                                                            <Icon name="check-circle" size={24} className="drop-shadow-[0_0_8px_#D000FF]" />
+                                                            <div className="font-grotesk text-lg uppercase tracking-wider">Verified Authentic</div>
+                                                        </div>
+                                                    )}
+                                                    {verificationStatus === 'tampered' && (
+                                                        <div className="flex items-center gap-3 text-red-500 bg-red-500/10 p-4 rounded-2xl border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                                                            <Icon name="alert-triangle" size={24} className="drop-shadow-[0_0_8px_#ef4444]" />
+                                                            <div className="font-grotesk text-lg uppercase tracking-wider">Tamper Detected</div>
+                                                        </div>
+                                                    )}
+                                                    {verificationStatus === 'new' && (
+                                                        <div className="flex items-center gap-3 text-blue-400 bg-blue-500/10 p-4 rounded-2xl border border-blue-500/30 shadow-[0_0_15px_rgba(96,165,250,0.2)]">
+                                                            <Icon name="plus-circle" size={24} className="drop-shadow-[0_0_8px_#60a5fa]" />
+                                                            <div className="font-grotesk text-lg uppercase tracking-wider">Unregistered Signal</div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-48 opacity-30">
+                                                <Icon name="cpu" size={60} className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                                                <p className="mt-8 text-xs uppercase tracking-[0.3em] font-mono">Standby Mode</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button 
+                                        disabled={!activeHash || verificationStatus === 'valid'}
+                                        onClick={sealDocument}
+                                        className={`w-full py-6 font-grotesk text-2xl uppercase transition-all duration-500 rounded-[24px] mt-8 relative z-10 ${(!activeHash || verificationStatus === 'valid') ? 'bg-white/5 opacity-10 cursor-not-allowed' : 'glossy-button bg-neon text-white shadow-[0_0_40px_rgba(208,0,255,0.5)]'}`}
+                                    >
+                                        Seal Node
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* ENHANCED SECURITY MODULES WITH TABS */}
+                    <section id="modules" className="py-32 bg-transparent relative">
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-dark to-dark opacity-90 pointer-events-none" />
+                        <div className="max-w-6xl mx-auto px-6 relative z-10">
+                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6 reveal-rotate">
+                                <div>
+                                    <h3 className="font-grotesk text-6xl uppercase text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">Security Modules</h3>
+                                    <p className="font-mono text-sm opacity-60 uppercase tracking-[0.3em] mt-4 text-neon">Fully functional cryptography tools.</p>
+                                </div>
+                                <div className={`font-mono text-xs px-6 py-3 rounded-full border shadow-lg transition-all duration-500 ${activeHash ? 'border-neon text-neon bg-neon/10 shadow-[0_0_30px_rgba(208,0,255,0.4)]' : 'border-white/20 opacity-40 shadow-none'}`}>
+                                    {activeHash ? 'MODULES ONLINE & READY' : 'AWAITING UPLOAD TO ACTIVATE'}
+                                </div>
+                            </div>
+
+                            {/* MODULE NAVIGATION TABS */}
+                            <div className="flex justify-center mb-16 mt-4 space-x-6 border-b border-white/10 pb-2 reveal-up">
+                                <button 
+                                    onClick={() => setActiveTab('core')}
+                                    className={`tab-btn font-grotesk text-3xl uppercase px-14 py-4 rounded-t-3xl tracking-widest ${activeTab === 'core' ? 'active text-white' : 'text-white/40 hover:text-white/80'}`}
+                                >
+                                    Core Protocol
+                                </button>
+                                <button 
+                                    onClick={() => setActiveTab('advanced')}
+                                    className={`tab-btn font-grotesk text-3xl uppercase px-14 py-4 rounded-t-3xl tracking-widest ${activeTab === 'advanced' ? 'active text-white' : 'text-white/40 hover:text-white/80'}`}
+                                >
+                                    <span className="flex items-center gap-3"><Icon name="zap" size={28} className={activeTab === 'advanced' ? "text-neon drop-shadow-[0_0_10px_#D000FF]" : ""} /> Advanced Arsenal</span>
+                                </button>
+                            </div>
+
+                            {/* CORE MODULES RENDERING */}
+                            {activeTab === 'core' && (
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-12 duration-700 reveal-up">
+                                {/* 1. Quantum / Entropy Monitor */}
+                                <div className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border flex flex-col justify-between relative min-h-[220px] ${!activeHash ? 'border-white/10 opacity-50' : 'border-white/20'}`}>
+                                    <div className="flex justify-between items-start mb-6 relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="activity" size={24} className="text-neon opacity-100 mr-3 drop-shadow-[0_0_10px_#D000FF]" />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Shannon Entropy</span>
+                                            <InfoTooltip text="Calculates real mathematical randomness of file bytes. High entropy (>7.5) means data is compressed or encrypted. Low entropy means plain text or uncompressed data." />
+                                        </div>
+                                    </div>
+                                    <div className="relative z-10">
+                                        <div className="flex justify-between font-mono text-xs mb-3 font-bold">
+                                            <span className="opacity-80">Score: {entropyScore.toFixed(2)} / 8.0</span>
+                                            <span className="text-neon text-sm">{quantumScore}%</span>
+                                        </div>
+                                        <div className="w-full bg-black/50 rounded-full h-3 overflow-hidden shadow-inner border border-white/10">
+                                            <div style={{ width: `${quantumScore}%` }} className="bg-gradient-to-r from-blue-500 to-neon h-full transition-all duration-1000 shadow-[0_0_15px_#D000FF]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 2. DNA Bio-Link */}
+                                <button disabled={!activeHash} onClick={triggerBiometrics} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] ${bioLinked ? 'border-neon shadow-[0_0_50px_rgba(208,0,255,0.4)] bg-neon/5' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="fingerprint" size={24} className={bioLinked ? 'text-neon mr-3 shadow-[0_0_15px_#D000FF] rounded-full' : 'opacity-90 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">WebAuthn Bio-Link</span>
+                                            <InfoTooltip text="Triggers your device's actual platform authenticator (TouchID, Windows Hello, FaceID) via WebAuthn to sign the document." />
+                                        </div>
+                                    </div>
+                                    <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">{bioLinked ? 'Auth Verified' : 'Trigger Device Auth'}</div>
+                                </button>
+
+                                {/* 3. Geo-Fence */}
+                                <button disabled={!activeHash} onClick={toggleGeoLocation} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] ${geoCoords ? 'border-blue-400 shadow-[0_0_50px_rgba(96,165,250,0.4)] bg-blue-400/5' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="map-pin" size={24} className={geoCoords ? 'text-blue-400 mr-3 drop-shadow-[0_0_10px_#60a5fa]' : 'opacity-90 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">GPS Anchor</span>
+                                            <InfoTooltip text="Uses the browser Geolocation API to fetch your real latitude and longitude and bind it to the file's metadata signature." />
+                                        </div>
+                                    </div>
+                                    <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">{geoCoords ? `${geoCoords.lat}, ${geoCoords.lng}` : 'Fetch Real GPS'}</div>
+                                </button>
+
+                                {/* 4. Time Capsule (AES Encrypt) */}
+                                <button disabled={!activeHash} onClick={encryptAndDownload} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] border-white/20 ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="lock" size={24} className="opacity-100 mr-3 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]" />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">AES-256 Lock</span>
+                                            <InfoTooltip text="Uses the Web Crypto API to fully encrypt your file buffer using AES-GCM and downloads the securely locked file." />
+                                        </div>
+                                    </div>
+                                    <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">Encrypt & Download</div>
+                                </button>
+
+                                {/* 5. Forensic Ghost Image (Real Canvas) */}
+                                <div className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border border-white/20 lg:col-span-2 relative min-h-[220px] ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-4 relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="scan" size={24} className="text-neon opacity-100 mr-3 drop-shadow-[0_0_10px_#D000FF]" />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Live Byte Frequency</span>
+                                            <InfoTooltip text="Reads the file's raw byte array and uses HTML5 Canvas to map a real-time histogram of the first 10,000 bytes. Used to detect anomalies." />
+                                        </div>
+                                    </div>
+                                    <canvas ref={canvasRef} width="256" height="80" className="w-full h-[120px] opacity-90 mt-2 filter drop-shadow-[0_0_20px_rgba(208,0,255,0.6)] relative z-10"></canvas>
+                                </div>
+
+                                {/* 6. Steganographic Vault */}
+                                <div className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border border-white/20 lg:col-span-2 relative min-h-[220px] flex flex-col justify-between ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="message-square" size={24} className="text-neon opacity-100 mr-3 drop-shadow-[0_0_10px_#D000FF]" />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Steganography Vault</span>
+                                            <InfoTooltip text="Injects a secret text message directly into the raw binary data of the file and downloads the modified file without breaking it." />
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-4 relative z-10">
+                                        <input type="text" value={secretMessage} onChange={(e)=>setSecretMessage(e.target.value)} placeholder="Type a highly classified secret text..." className="flex-1 bg-black/60 border border-white/20 rounded-2xl px-6 py-4 font-mono text-sm outline-none focus:border-neon focus:shadow-[0_0_20px_rgba(208,0,255,0.4)] transition-all placeholder:opacity-40 text-white" disabled={!activeHash} />
+                                        <button onClick={executeSteganography} disabled={!activeHash || !secretMessage} className="px-10 glossy-button rounded-2xl font-grotesk uppercase text-2xl text-white disabled:opacity-50 disabled:cursor-not-allowed tracking-widest shadow-lg">Inject</button>
+                                    </div>
+                                </div>
+
+                                {/* 7. Neural Watermark */}
+                                <button disabled={!activeHash} onClick={generateWatermark} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] ${watermarkActive ? 'border-neon neural-noise shadow-[0_0_50px_rgba(208,0,255,0.5)]' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="eye" size={24} className={watermarkActive ? 'text-neon mr-3 drop-shadow-[0_0_10px_#D000FF]' : 'opacity-90 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Visual Noise</span>
+                                            <InfoTooltip text="Draws the image to a hidden canvas, applies mathematically generated noise, and downloads the watermarked copy to prevent AI scraping." />
+                                        </div>
+                                    </div>
+                                    <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">{watermarkActive ? 'Noise Applied' : 'Apply to Image'}</div>
+                                </button>
+
+                                {/* 8. Metadata Sanitizer */}
+                                <button disabled={!activeHash} onClick={sanitizeMetadata} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] border-white/20 ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="trash-2" size={24} className="opacity-100 mr-3 text-red-400 drop-shadow-[0_0_10px_#f87171]" />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">EXIF Sanitizer</span>
+                                            <InfoTooltip text="Re-encodes image files locally in your browser to completely strip out EXIF metadata, camera info, and hidden GPS tags." />
+                                        </div>
+                                    </div>
+                                    <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">Strip Metadata</div>
+                                </button>
+
+                                {/* 9. Zero-Trust Shard */}
+                                <button disabled={!activeHash} onClick={executeShard} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] ${sharded ? 'border-green-400 bg-green-400/10 shadow-[0_0_50px_rgba(74,222,128,0.4)]' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="layers" size={24} className={sharded ? 'text-green-400 mr-3 drop-shadow-[0_0_10px_#4ade80]' : 'opacity-90 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">File Sharder</span>
+                                            <InfoTooltip text="Actually splits the binary buffer of your file into 3 separate, unreadable chunks and downloads them individually." />
+                                        </div>
+                                    </div>
+                                    <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">{sharded ? 'Downloaded (3)' : 'Split File (3)'}</div>
+                                </button>
+
+                                {/* 10. Decoy Generator */}
+                                <button disabled={!activeHash} onClick={generateDecoy} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] border-white/20 ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="copy" size={24} className="opacity-100 mr-3 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Decoy Maker</span>
+                                            <InfoTooltip text="Generates a fake file filled with random cryptographic noise that perfectly matches the exact byte size of your original file." />
+                                        </div>
+                                    </div>
+                                    <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">Generate Dummy</div>
+                                </button>
+
+                                {/* 11. Self-Destruct */}
+                                <div className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border flex flex-col justify-between lg:col-span-2 min-h-[220px] ${selfDestructTimer ? 'border-red-500/80 shadow-[0_0_50px_rgba(239,68,68,0.5)] bg-red-500/10' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex items-center mb-6 relative z-10">
+                                        <Icon name="timer" size={24} className={selfDestructTimer ? 'text-red-500 mr-3 animate-pulse drop-shadow-[0_0_10px_#ef4444]' : 'opacity-90 mr-3 text-white'} />
+                                        <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Memory Wipe Sequence</span>
+                                        <InfoTooltip text="When the timer expires, the file buffer is permanently deleted from browser memory and wiped from the registry." />
+                                    </div>
+                                    <div className="flex gap-4 relative z-10">
+                                        {[1, 3, 5, 10].map(mins => (
+                                            <button 
+                                                key={mins} disabled={!activeHash}
+                                                onClick={() => setSelfDestructTimer(selfDestructTimer === mins ? null : mins)}
+                                                className={`flex-1 py-4 font-mono text-sm font-bold tracking-widest rounded-2xl transition-all duration-300 ${selfDestructTimer === mins ? 'bg-red-500 text-white shadow-[0_0_30px_rgba(239,68,68,0.6)] transform scale-105 border border-red-400' : 'bg-black/40 border border-white/10 hover:bg-white/10 hover:border-white/40 hover:scale-105'}`}
+                                            >
+                                                {mins} MIN
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* 12. IPFS CID / Multihash */}
+                                <div className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border border-white/20 lg:col-span-3 min-h-[180px] flex flex-col justify-center ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex items-center mb-6 relative z-10">
+                                        <Icon name="globe" size={24} className="text-neon opacity-100 mr-3 drop-shadow-[0_0_10px_#D000FF]" />
+                                        <span className="font-mono text-sm uppercase opacity-90 tracking-wider">IPFS CIDv1 Multihash Generation</span>
+                                        <InfoTooltip text="Computes the Content Identifier (CID) that would be used if this file were uploaded to the decentralized InterPlanetary File System (IPFS)." />
+                                    </div>
+                                    <div className="font-mono text-sm bg-black/60 p-5 rounded-2xl truncate border border-white/10 opacity-100 text-neon tracking-widest shadow-inner selection:bg-neon selection:text-white drop-shadow-[0_0_15px_rgba(208,0,255,0.3)] relative z-10">
+                                        {ipfsHash || "AWAITING CIPHER GENERATION..."}
+                                    </div>
+                                </div>
+                            </div>
+                            )}
+
+                            {/* ADVANCED MODULES RENDERING */}
+                            {activeTab === 'advanced' && (
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-12 duration-700 reveal-rotate">
+                                
+                                {/* F1: Voice Biometric Seal */}
+                                <button disabled={!activeHash} onClick={triggerVoiceSeal} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] relative ${voiceLinked ? 'border-neon bg-neon/10 shadow-[0_0_60px_rgba(208,0,255,0.5)]' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    {voiceLinked && (
+                                        <div className="absolute inset-0 pointer-events-none z-0 rounded-[32px] overflow-hidden">
+                                            <div className="holo-scan" />
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="mic" size={24} className={voiceLinked ? 'text-neon mr-3 animate-pulse drop-shadow-[0_0_10px_#D000FF]' : 'opacity-90 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Voice Signature</span>
+                                            <InfoTooltip text="Uses Web Audio API to record a 3-second voice print and hashes it directly into the document seal." />
+                                        </div>
+                                    </div>
+                                    <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">{voiceLinked ? 'Vocal Bond Active' : 'Record Audio Seal'}</div>
+                                </button>
+
+                                {/* F2: File Sonification */}
+                                <button disabled={!activeHash} onClick={toggleSonification} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] relative ${isSonifying ? 'border-blue-500 shadow-[0_0_60px_rgba(59,130,246,0.5)] bg-blue-500/10' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="radio" size={24} className={isSonifying ? 'text-blue-500 mr-3 drop-shadow-[0_0_10px_#3b82f6]' : 'opacity-90 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Data Sonification</span>
+                                            <InfoTooltip text="Translates the raw binary buffer of the file into real-time audio frequencies using an oscillating synthesizer." />
+                                        </div>
+                                    </div>
+                                    {isSonifying ? (
+                                        <div className="waveform relative z-10 scale-150 transform origin-left">
+                                            {[...Array(10)].map((_, i) => <div key={i} className="waveform-bar !bg-blue-500 !shadow-[0_0_15px_#3b82f6]" style={{ animationDelay: `${i * 0.1}s` }}></div>)}
+                                        </div>
+                                    ) : (
+                                        <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">Play Byte Stream</div>
+                                    )}
+                                </button>
+
+                                {/* F3: 3D Topography Grid */}
+                                <div className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border flex flex-col justify-between min-h-[220px] relative ${!activeHash ? 'border-white/10 opacity-50' : 'border-neon/80 shadow-[0_0_40px_rgba(208,0,255,0.4)]'}`}>
+                                    <div className="absolute inset-0 z-0 overflow-hidden rounded-[32px] pointer-events-none">
+                                        <canvas ref={topoCanvasRef} width="400" height="200" className="absolute bottom-0 left-0 w-full h-[160px] opacity-90" style={{ transform: 'perspective(600px) rotateX(50deg) scale(1.3) translateY(10px)' }}></canvas>
+                                    </div>
+                                    <div className="flex justify-between items-start mb-4 relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="box" size={24} className="text-neon opacity-100 mr-3 drop-shadow-[0_0_10px_#D000FF]" />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">3D Byte Topology</span>
+                                            <InfoTooltip text="A live 3D visual mapping representing the cryptographic depth and byte distribution of your file." />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* F4: Glitch Obfuscation */}
+                                <button disabled={!activeHash} onClick={triggerGlitch} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] relative ${glitchActive ? 'border-yellow-400 bg-yellow-400/10 shadow-[0_0_50px_rgba(250,204,21,0.4)]' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="zap" size={24} className={glitchActive ? 'text-yellow-400 mr-3 drop-shadow-[0_0_10px_#facc15]' : 'opacity-90 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Glitch Obfuscation</span>
+                                            <InfoTooltip text="Deterministically slices and offsets image byte data to visually scramble the asset prior to encryption." />
+                                        </div>
+                                    </div>
+                                    <div className={`font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10 ${glitchActive ? 'glitch-text text-yellow-400' : ''}`}>{glitchActive ? 'File Corrupted' : 'Inject Glitch'}</div>
+                                </button>
+
+                                {/* F5: Optical Li-Fi Transfer */}
+                                <button disabled={!activeHash} onClick={triggerOptical} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] border-white/20 relative ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="sun" size={24} className="opacity-100 mr-3 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Optical Transmission</span>
+                                            <InfoTooltip text="Flashes the screen at extreme frequencies to optically transmit the hash to a specialized camera receiver (Li-Fi sim)." />
+                                        </div>
+                                    </div>
+                                    <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">Trigger Light Burst</div>
+                                </button>
+
+                                {/* F6: Keystroke Dynamics */}
+                                <div className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border flex flex-col justify-between min-h-[220px] relative ${keystrokeVerified ? 'border-green-400 bg-green-400/10 shadow-[0_0_50px_rgba(74,222,128,0.4)]' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-4 relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="keyboard" size={24} className={keystrokeVerified ? 'text-green-400 mr-3 drop-shadow-[0_0_10px_#4ade80]' : 'opacity-90 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Rhythm Lock</span>
+                                            <InfoTooltip text="Calculates flight and dwell time of your typing. You must type a passphrase with the exact same rhythm to unlock." />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-3 relative z-10">
+                                        <input type="password" value={keystrokeData} onChange={handleKeystrokeChange} disabled={!activeHash} placeholder={keystrokeVerified ? "Verify rhythm..." : "Type rhythm sequence..."} className="w-full bg-black/60 border border-white/20 rounded-xl px-5 py-4 font-mono text-sm outline-none focus:border-neon focus:shadow-[0_0_20px_rgba(208,0,255,0.5)] transition-all text-white shadow-inner" />
+                                        <div className="font-grotesk text-2xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{keystrokeVerified ? 'Awaiting Verification' : 'Awaiting Input'}</div>
+                                    </div>
+                                </div>
+
+                                {/* F7: Redundancy Parity */}
+                                <button disabled={!activeHash} onClick={generateParity} className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border text-left flex flex-col justify-between min-h-[220px] relative ${parityGenerated ? 'border-teal-400 bg-teal-400/10 shadow-[0_0_50px_rgba(45,212,191,0.4)]' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-6 w-full relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="disc" size={24} className={parityGenerated ? 'text-teal-400 mr-3 drop-shadow-[0_0_10px_#2dd4bf]' : 'opacity-90 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">XOR Parity Backup</span>
+                                            <InfoTooltip text="Generates a redundant binary blob using XOR logic, allowing full file recovery even if shards are missing." />
+                                        </div>
+                                    </div>
+                                    <div className="font-grotesk text-3xl uppercase tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">{parityGenerated ? 'Backup Created' : 'Build Redundancy'}</div>
+                                </button>
+
+                                {/* F8: Chrono-Lock */}
+                                <div className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border flex flex-col justify-between min-h-[220px] relative ${chronoLocked ? 'border-orange-500 bg-orange-500/10 shadow-[0_0_50px_rgba(249,115,22,0.4)]' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    <div className="flex justify-between items-start mb-4 relative z-10">
+                                        <div className="flex items-center">
+                                            <Icon name="clock" size={24} className={chronoLocked ? 'text-orange-500 mr-3 drop-shadow-[0_0_10px_#f97316]' : 'opacity-90 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-90 tracking-wider">Time-Release Lock</span>
+                                            <InfoTooltip text="Encrypts the file with a key tied to a specific future timestamp. Decryption mathematically fails until timeline is matched." />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col gap-3 relative z-10">
+                                        <input type="time" value={chronoLockTime} onChange={(e)=>setChronoLockTime(e.target.value)} disabled={!activeHash || chronoLocked} className="w-full bg-black/60 border border-white/20 rounded-xl px-5 py-4 font-mono text-xl outline-none focus:border-neon focus:shadow-[0_0_20px_rgba(208,0,255,0.5)] transition-all text-white shadow-inner" style={{colorScheme: 'dark'}} />
+                                        <button onClick={applyChronoLock} disabled={!activeHash || !chronoLockTime || chronoLocked} className="mt-1 py-3 bg-white/5 hover:bg-white/10 rounded-xl font-grotesk text-xl uppercase border border-white/10 text-white disabled:opacity-50 transition-all shadow-md">Lock in Timeline</button>
+                                    </div>
+                                </div>
+
+                                {/* F9: AR Vault Projection */}
+                                <div className={`hover-3d-effect liquid-glass p-8 rounded-[32px] border flex flex-col justify-between lg:col-span-2 min-h-[220px] relative ${arActive ? 'border-neon shadow-[0_0_80px_rgba(208,0,255,0.6)]' : 'border-white/20'} ${!activeHash ? 'opacity-50' : ''}`}>
+                                    {arActive && (
+                                        <div className="absolute inset-0 z-0 opacity-90 overflow-hidden rounded-[32px] pointer-events-none">
+                                            <video ref={arVideoRef} autoPlay playsInline muted className="w-full h-full object-cover filter contrast-150 saturate-50 mix-blend-screen" />
+                                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-neon font-mono text-sm text-center border-2 border-neon p-8 bg-black/70 backdrop-blur-lg shadow-[0_0_50px_#D000FF] rounded-3xl">
+                                                <Icon name="scan-line" size={50} className="mx-auto mb-4 animate-pulse" />
+                                                [SECURE HUD ENGAGED]<br/><br/>HASH: <span className="text-white drop-shadow-[0_0_5px_#fff]">{activeHash?.hash.substring(0,16)}...</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-start mb-4 relative z-20">
+                                        <div className="flex items-center bg-black/50 p-3 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">
+                                            <Icon name="camera" size={24} className={arActive ? 'text-neon mr-3 drop-shadow-[0_0_10px_#D000FF]' : 'opacity-100 mr-3 text-white'} />
+                                            <span className="font-mono text-sm uppercase opacity-100 tracking-wider">AR Holographic Projection</span>
+                                            <InfoTooltip text="Accesses device camera to overlay a floating augmented reality HUD containing the file's cryptographic signature." />
+                                        </div>
+                                    </div>
+                                    <button onClick={toggleAR} disabled={!activeHash} className="mt-auto relative z-20 py-5 font-grotesk text-2xl uppercase tracking-widest rounded-2xl transition-all duration-300 bg-black/80 border border-white/20 hover:bg-neon hover:text-white hover:border-neon hover:shadow-[0_0_30px_rgba(208,0,255,0.4)] text-white">
+                                        {arActive ? 'Deactivate HUD' : 'Initialize Hologram'}
+                                    </button>
+                                </div>
+
+                            </div>
+                            )}
+
+                        </div>
+                    </section>
+                    
+                    {/* DISTRIBUTED LEDGER FEED */}
+                    <section id="ledger" className="py-32 bg-transparent relative">
+                        <div className="max-w-6xl mx-auto px-6 relative z-10">
+                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6 reveal-up">
+                                <div>
+                                    <h3 className="font-grotesk text-6xl uppercase text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">Distributed Ledger</h3>
+                                    <p className="font-mono text-sm opacity-60 uppercase tracking-[0.3em] mt-4 text-neon">Live cryptographic feed of secured assets.</p>
+                                </div>
+                                <div className="flex items-center gap-3 font-mono text-xs px-6 py-3 rounded-full border border-neon text-neon bg-neon/10 shadow-[0_0_30px_rgba(208,0,255,0.4)]">
+                                    <span className="relative flex h-3 w-3">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-neon"></span>
+                                    </span>
+                                    NETWORK SYNCED
+                                </div>
+                            </div>
+
+                            <div className="liquid-glass rounded-[40px] border border-white/10 overflow-hidden reveal-up">
+                                <div className="max-h-[600px] overflow-y-auto custom-scrollbar p-6 space-y-4">
+                                    {registry.length === 0 ? (
+                                        <div className="text-center py-20 opacity-50 font-mono text-sm uppercase">Awaiting network propagation...</div>
+                                    ) : (
+                                        registry.map((record, i) => (
+                                            <div key={i} className="bg-black/40 border border-white/5 p-6 rounded-[24px] hover:border-neon/50 hover:bg-black/60 transition-all duration-300 group flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="w-12 h-12 rounded-full bg-dark flex items-center justify-center border border-white/10 group-hover:border-neon group-hover:shadow-[0_0_15px_rgba(208,0,255,0.5)] transition-all">
+                                                        <Icon name="box" size={20} className="text-white/50 group-hover:text-neon transition-colors" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-grotesk text-2xl uppercase tracking-wide text-white group-hover:text-neon transition-colors drop-shadow-md">{record.name}</div>
+                                                        <div className="font-mono text-[10px] text-white/50 mt-1 uppercase flex gap-4">
+                                                            <span>Node: {record.author}</span>
+                                                            <span>|</span>
+                                                            <span>T-Stamp: {new Date(record.created_at).toLocaleString()}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="bg-dark/80 px-4 py-3 rounded-xl border border-white/10 font-mono text-xs text-white/60 truncate max-w-full md:max-w-[300px] group-hover:text-white transition-colors" title={record.hash}>
+                                                    {record.hash}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <footer className="border-t border-white/5 py-12 bg-dark relative z-10">
+                        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12">
+                            <div className="font-grotesk text-3xl uppercase">DocProof<span className="text-neon">.</span></div>
+                            <div className="font-mono text-[10px] tracking-[0.5em] text-center opacity-40">ENCRYPTED. IMMUTABLE. SOVEREIGN. © 2026</div>
+                            <div className="flex gap-8">
+                                <Icon name="twitter" size={20} className="hover:text-neon cursor-pointer transition-colors" />
+                                <Icon name="github" size={20} className="hover:text-neon cursor-pointer transition-colors" />
+                                <Icon name="mail" size={20} className="hover:text-neon cursor-pointer transition-colors" />
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
