@@ -2,9 +2,8 @@
 Hackathon team repository for The Living Tombstone - [hackindia-team:web3-hackathon-2026:the-living-tombstone]
 ## 🚀 Live Prototype
 
-🔗 Prototype: [(https://doc-proof.vercel.app/)]
+🔗 Prototype: [(https://the-living-tombstone-web3-hackathon.vercel.app/)]
 
-🎥 Demo Video:[(https://drive.google.com/file/d/1DzOD7tMd-hvG7n-NU0sHSNhZu2QCUpM3/view?usp=sharing)]
 
 # DocProof | The Cryptographic Standard
 
